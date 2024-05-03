@@ -1,27 +1,43 @@
-name: Deploy 
-
-
+name: Deploy React to AWS EC2
 
 on:
   push:
     branches:
-      -  react-static
+      - react-static  # Change to your desired branch
 
 jobs:
   deploy:
-    runs-on: self-hosted  
-    
+    runs-on: self-hosted  # Or 'ubuntu-latest' if using GitHub-hosted runners
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
+      # Checkout the code from the react-static branch
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: react-static  # Ensures the correct branch is checked out
 
-      - name: Build and Deploy
-        run: |
-          npm install
-          npm run build
-          
-          sudo cp -r ./build/* /var/www/html
+      # Setup Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Adjust Node.js version as needed
 
-      - name: Restart Nginx
+      # Install dependencies and build the React app
+      - name: Install dependencies and build
         run: |
-          sudo systemctl restart nginx
+          npm install  # Installs all dependencies
+          npm run build  # Builds the React app
+
+      # Connect to AWS EC2 via SSH to deploy the build
+      - name: Deploy to AWS EC2
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}  # EC2 public IP or DNS
+          username: ubuntu  # Adjust based on your EC2 setup
+          key: ${{ secrets.EC2_SSH_KEY }}  # SSH private key (stored in GitHub Secrets)
+          script: |
+            # Copy build output to the EC2 instance
+            scp -r ./build/* ubuntu@${{ secrets.EC2_HOST }}:/path/to/deployment/directory
+
+            # Restart the application or web server if needed
+            sudo systemctl restart your-application-service  # Adjust as needed
