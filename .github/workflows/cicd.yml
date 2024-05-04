@@ -14,10 +14,10 @@ jobs:
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
       - name: Build Docker Image
-        run: docker build -t integrationninjas/react-static .
+        run: docker build -t ranjithkumarbandi/react-static .
       - name: Publish image to docker hub
         # run: docker push integrationninjas/react-static:latest   
-        run: docker push ranjithkumarbandi/react-static:latest
+        run: docker push ranjithkumarbandi/react-static:staging
 
   deploy: 
     needs: build
@@ -25,8 +25,8 @@ jobs:
     steps:
       - name: Pull image from docker hub
         # run: docker pull integrationninjas/react-static:latest 
-        run: docker pull ranjithkumarbandi/react-static:latest 
+        run: docker push ranjithkumarbandi/react-static:staging
       - name: Delete Old Container
         run: docker rm -f reactContainer
       - name: Run docker container
-        run: docker run -d -p 3000:80 --name reactContainer integrationninjas/react-static   
+        run: docker run -d -p 3000:80 --name reactContainer ranjithkumarbandi/react-static  
