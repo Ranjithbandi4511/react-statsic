@@ -1,43 +1,33 @@
-name: Deploy React to AWS EC2
+name: Deploy React App to AWS EC2
 
+# Trigger the workflow when there's a push to the "react-static" branch
 on:
   push:
     branches:
-      - react-static  # Change to your desired branch
+      - react-static
 
 jobs:
   deploy:
-    runs-on: self-hosted  # Or 'ubuntu-latest' if using GitHub-hosted runners
+    # Specify the runner (self-hosted if you're using a self-hosted GitHub Actions runner)
+    runs-on: self-hosted
 
     steps:
-      # Checkout the code from the react-static branch
+      # Step 1: Checkout the code from the GitHub repository
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          ref: react-static  # Ensures the correct branch is checked out
 
-      # Setup Node.js environment
+      # Step 2: Set up Node.js environment to build the React app
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # Adjust Node.js version as needed
+          node-version: '16'  # Change Node.js version as needed
 
-      # Install dependencies and build the React app
-      - name: Install dependencies and build
+      # Step 3: Install dependencies and build the React app
+      - name: Build React app
         run: |
-          npm install  # Installs all dependencies
-          npm run build  # Builds the React app
+          npm install
+          npm run build
 
-      # Connect to AWS EC2 via SSH to deploy the build
-      - name: Deploy to AWS EC2
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.EC2_HOST }}  # EC2 public IP or DNS
-          username: ubuntu  # Adjust based on your EC2 setup
-          key: ${{ secrets.EC2_SSH_KEY }}  # SSH private key (stored in GitHub Secrets)
-          script: |
-            # Copy build output to the EC2 instance
-            scp -r ./build/* ubuntu@${{ secrets.EC2_HOST }}:/path/to/deployment/directory
-
-            # Restart the application or web server if needed
-            sudo systemctl restart your-application-service  # Adjust as needed
+      # Step 4: Deploy to AWS EC2
+      - name: Deploy to AWS EC2 via SSH
+        uses: appleboy/ssh-action@v0
