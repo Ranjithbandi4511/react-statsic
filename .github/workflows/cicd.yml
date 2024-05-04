@@ -17,7 +17,7 @@ jobs:
         run: docker build -t ranjithkumarbandi/react-static .
       - name: Publish image to docker hub
         # run: docker push integrationninjas/react-static:latest   
-        run: docker push ranjithkumarbandi/react-static:staging
+        run: docker push ranjithkumarbandi/react-static:latest
 
   deploy: 
     needs: build
@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Pull image from docker hub
         # run: docker pull integrationninjas/react-static:latest 
-        run: docker pull ranjithkumarbandi/react-static:staging
+        run: docker pull ranjithkumarbandi/react-static:latest
       - name: Delete Old Container
         run: docker rm -f reactContainer
       - name: Run docker container
