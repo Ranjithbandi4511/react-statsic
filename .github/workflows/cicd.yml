@@ -21,7 +21,7 @@ jobs:
 
   deploy: 
     needs: build
-    runs-on: ip-172-31-22-31
+    runs-on: 172-31-22-31
     steps:
       - name: Pull image from docker hub
         # run: docker pull integrationninjas/react-static:latest 
