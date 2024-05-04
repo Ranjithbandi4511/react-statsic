@@ -1,25 +1,15 @@
-# Step 1: Build the React App
-FROM node:16-alpine AS builder  # Using a lightweight Node.js base image
-WORKDIR /app  # Setting the working directory in the container
-
-# Copy package.json and install dependencies
-COPY package.json package-lock.json .  # Copy package files
-RUN npm install  # Install dependencies
-
-# Copy the rest of the source code and build the React app
+# Step 1: Build React App
+FROM node:alpine3.18 as build
+WORKDIR /app 
+COPY package.json .
+RUN npm install
 COPY . .
-RUN npm run build  # Build the React app
+RUN npm run build
 
-# Step 2: Create the Final Docker Image
-FROM nginx:alpine  # Use Nginx to serve the built React app
-WORKDIR /usr/share/nginx/html  # Default directory for serving files with Nginx
-
-# Remove existing Nginx files and copy the build output from the builder stage
-RUN rm -rf ./*  # Clean the Nginx directory
-COPY --from=builder /app/build .  # Copy build artifacts from the builder stage
-
-# Expose port 80 for HTTP traffic
+# Step 2: Server With Nginx
+FROM nginx:1.23-alpine
+WORKDIR /usr/share/nginx/html
+RUN rm -rf *
+COPY --from=build /app/build .
 EXPOSE 80
-
-# Set the command to keep Nginx running
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+ENTRYPOINT [ "nginx", "-g", "daemon off;" ]
